@@ -25,8 +25,7 @@ val splitparq = parq
 .withColumn("col3", split(col("values"), ";").getItem(2))
 .withColumn("col4", split(col("values"), ";").getItem(3))
 .withColumn("col5", split(col("values"), ";").getItem(4))
-.groupBy($"country").agg(sum($"col1"),sum($"col2"),sum($"col3"),sum($"col4"),sum($"col5")).select($"country",concat_ws(";",$"sum(col1)",$"sum(col2)",$"sum(col3)",$"sum(col4)",$"sum(col5)").alias("values")).show()
-
+.groupBy($"country").agg(sum($"col1"),sum($"col2"),sum($"col3"),sum($"col4"),sum($"col5")).select($"country",concat_ws(";",$"sum(col1)",$"sum(col2)",$"sum(col3)",$"sum(col4)",$"sum(col5)").alias("values")).orderBy($"country")
 //splitting the columns using ";" and aggregating the column values while grouping by country
 
 /*+-------+---------+---------+---------+---------+---------+                     
@@ -40,15 +39,17 @@ val splitparq = parq
 +-------+---------+---------+---------+---------+---------+*/
 
 /*scala> splitparq.show(20,false)
+/*
 +-------+-----------------------------+                                         
 |country|values                       |
 +-------+-----------------------------+
-|India  |246.0;153.0;148.0;100.0;90.0 |
 |Canada |183.0;258.0;150.0;263.0;71.0 |
-|England|178.0;114.0;175.0;173.0;153.0|
 |China  |218.0;239.0;234.0;209.0;75.0 |
+|England|178.0;114.0;175.0;173.0;153.0|
 |Germany|144.0;166.0;151.0;172.0;70.0 |
-+-------+-----------------------------+*/
+|India  |246.0;153.0;148.0;100.0;90.0 |
++-------+-----------------------------+
+*/
 
 splitparq.repartition(5)  //repartition the DF
 splitparq.write.parquet("hdfs://quickstart.cloudera:8020/rishabh/country/final/") //writing to HDFS
